@@ -1,10 +1,10 @@
-# Plagiarism checker for docx-files
+# Plagiarism checker for .docx files
 
-This python scripts finds cases of plagiarism for a bunch of word files.
+This python scripts is an easy way to find cases of plagiarism among mulitple word files.
 
 ## How to use
 
-* Store all docx-files in the directory `files`. The docx-files can also be in subdirectory. The script is recursive.
+Store all .docx files in the directory `files`. The docx-files can also be in subdirectory. The script is recursive.
 
 ```
 python3.5 word_duplicate_checker.py
