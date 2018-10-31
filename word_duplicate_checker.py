@@ -1,36 +1,46 @@
 # -*- coding: utf-8 -*-
+#  python3.5 word_duplicate_checker.py
+# https://www.mathsisfun.com/combinatorics/combinations-permutations-calculator.html
 
 import os
 import io
 import docx2txt
 from itertools import combinations
+from tqdm import tqdm
 from difflib import SequenceMatcher
+import glob
 
-# Variable declaration
-path = os.getcwd() + "/files"
-entries = os.listdir(path)
-filenames = [os.path.join(path, entry) for entry in entries if os.path.isfile(os.path.join(path, entry))]
-
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
+# Get all docx files
+filenames = [filename for filename in glob.iglob('files/**/*.docx', recursive=True)]
     
-duplicates = open('duplicates.txt', 'w+')
+def check_plagiarism():
 
-for (file1, file2) in combinations(filenames, 2):
+    # Open connection for duplicates
+    duplicates = open('duplicates.txt', 'w+')
 
-    text1 = docx2txt.process(file1)
-    text2 = docx2txt.process(file2)
-    similarity = similar(text1, text2)
-    
-    # print(similarity)
+    # Check combinations of all files
+    for (file1, file2) in tqdm(combinations(filenames, 2)):
+        
+        try:
+            text1 = docx2txt.process(file1)
+            text2 = docx2txt.process(file2)
+        except KeyError:
+            continue
 
-    if similarity > .2:
-        res = "%s - %s: %f" % (file1.split("\\")[-1], file2.split("\\")[-1], similarity)
-        print(res)
+        similarity = SequenceMatcher(None, text1, text2).ratio()
 
-    if similarity > .7:
-        res = "%s - %s: %f" % (file1.split("\\")[-1], file2.split("\\")[-1], similarity)
-        print(res)
+        # Save plagiarism cases
+        if similarity > .7:
+            res = "%s - %s: %f" % (file1.split("\\")[-1], file2.split("\\")[-1], similarity)
+            print(res)
 
-        with open("duplicates.txt", "a+") as myfile:
-            myfile.write(res + "\n")
+            # Store plagiarism
+            with open("duplicates.txt", "a+") as myfile:
+                myfile.write(res + "\n")
+        # Potential plagiarism cases
+        elif similarity > .2:
+            res = "%s - %s: %f" % (file1.split("\\")[-1], file2.split("\\")[-1], similarity)
+            print(res)
+
+if __name__ == "__main__":
+    check_plagiarism()
